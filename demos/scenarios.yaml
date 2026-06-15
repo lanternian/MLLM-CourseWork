@@ -1,0 +1,104 @@
+# 网页多模态 Agent 演示场景配置
+
+# 本文件定义了用于评测的测试场景
+# 使用方法：python -m web_agent eval --config demos/scenarios.yaml
+
+scenarios:
+  # ==================== 百度场景 ====================
+  - id: baidu_search_basic
+    site: 百度
+    start_url: "https://www.baidu.com/"
+    task: "在搜索框中输入「多模态学习」，然后搜索，看到搜索结果页面后结束任务"
+    repeats: 5
+    success:
+      url_contains: ["baidu.com/s"]
+      title_contains: ["多模态学习"]
+      text_contains: ["百度为您找到相关结果"]
+
+  - id: baidu_search_advanced
+    site: 百度
+    start_url: "https://www.baidu.com/"
+    task: "搜索「Mind2Web 数据集」，点击第一个结果链接，等待页面加载完成后结束"
+    repeats: 5
+    success:
+      url_contains: ["mind2web", "github"]
+      title_contains: ["Mind2Web", "GitHub"]
+
+  - id: baidu_news_search
+    site: 百度新闻
+    start_url: "https://www.baidu.com/"
+    task: "点击「新闻」链接，然后在新闻搜索框中搜索「人工智能」，看到结果后结束"
+    repeats: 3
+    success:
+      url_contains: ["baidu.com/s?tn=news"]
+      title_contains: ["人工智能"]
+
+  # ==================== 哔哩哔哩场景 ====================
+  - id: bilibili_search_video
+    site: 哔哩哔哩
+    start_url: "https://www.bilibili.com/"
+    task: "在搜索框中输入「多模态」，点击搜索按钮，看到搜索结果页面后结束任务"
+    repeats: 5
+    success:
+      url_contains: ["search.bilibili.com"]
+      title_contains: ["多模态"]
+
+  - id: bilibili_play_video
+    site: 哔哩哔哩
+    start_url: "https://www.bilibili.com/"
+    task: "搜索「Agent 智能体」，找到第一个播放量超过1万的视频并点击播放，等待视频开始播放后结束"
+    repeats: 3
+    success:
+      url_contains: ["bilibili.com/video"]
+      text_contains: ["播放", "立即播放"]
+
+  - id: bilibili_search_anime
+    site: 哔哩哔哩
+    start_url: "https://www.bilibili.com/"
+    task: "进入「动画」分区，然后搜索「2024年新番」，看到结果后结束"
+    repeats: 3
+    success:
+      url_contains: ["bilibili.com/v/channel", "search.bilibili.com"]
+      title_contains: ["动画", "2024"]
+
+  # ==================== 扩展场景（需要额外测试） ====================
+  # 以下是一些可能的扩展场景，需要根据实际网站情况调整
+  
+  # - id: jd_search_product
+  #   site: 京东
+  #   start_url: "https://www.jd.com/"
+  #   task: "搜索「笔记本电脑」，看到搜索结果后结束"
+  #   repeats: 3
+  #   success:
+  #     url_contains: ["search.jd.com"]
+  #     title_contains: ["笔记本电脑"]
+
+  # - id: zhihu_search
+  #   site: 知乎
+  #   start_url: "https://www.zhihu.com/"
+  #   task: "搜索「多模态AI」，看到搜索结果后结束"
+  #   repeats: 3
+  #   success:
+  #     url_contains: ["zhihu.com/search"]
+  #     title_contains: ["多模态AI"]
+
+# ==================== 使用说明 ====================
+# 
+# 1. 运行单个场景测试：
+#    python -m web_agent run --url "https://www.baidu.com/" --task "你的任务描述"
+#
+# 2. 运行批量评测：
+#    python -m web_agent eval --config demos/scenarios.yaml --output artifacts/evaluation
+#
+# 3. 查看评测结果：
+#    - 打开 artifacts/evaluation/summary.json
+#    - 查看 artifacts/evaluation/summary.md
+#
+# 4. 调整重复次数：
+#    - 修改上方每个场景的 repeats 字段
+#    - 或使用 --repeats 参数统一设置
+#
+# 5. 自定义成功条件：
+#    - url_contains: 最终URL必须包含任意一个关键词
+#    - title_contains: 页面标题必须包含任意一个关键词
+#    - text_contains: 页面文本必须包含任意一个关键词

@@ -12,16 +12,6 @@ from .agent import WebAgent
 from .models import RunResult, Scenario
 
 
-SITE_BLOCK_MARKERS = (
-    "安全验证",
-    "验证码",
-    "captcha",
-    "访问受限",
-    "access denied",
-    "verify you are human",
-)
-
-
 def load_scenarios(path: Path) -> list[Scenario]:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     return [Scenario.model_validate(item) for item in data["scenarios"]]
@@ -95,17 +85,12 @@ def run_evaluation(
 
 
 def classify_failed_result(result: RunResult) -> str:
-    page_evidence = " ".join(
-        [result.final_url, result.final_title, result.final_text]
-    ).lower()
-    if any(marker.lower() in page_evidence for marker in SITE_BLOCK_MARKERS):
-        return "execution_failure"
     return "planning_failure" if result.completed else "execution_failure"
 
 
 def _failure_message(failure_type: str) -> str:
     if failure_type == "execution_failure":
-        return "Success criteria were not met because execution or site access was blocked"
+        return "The run ended before the configured success criteria were met"
     return "The agent stopped without satisfying the configured success criteria"
 
 

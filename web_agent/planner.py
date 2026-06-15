@@ -33,9 +33,12 @@ Rules:
 4. Finish only when the user's goal is visibly satisfied or clearly impossible.
 5. Keep text input exactly aligned with the user's request.
 6. For a failed finish, classify it as recognition_failure, planning_failure,
-   or execution_failure. Captchas and site access blocks are execution failures.
+   or execution_failure.
 7. After filling a search input, prefer pressing Enter on that same input instead
    of visually guessing a search button.
+8. A captcha, security check, or access-warning page is an intermediate page
+   state, not an automatic failure. Continue observing and choose a legal visible
+   action. Do not finish solely because such text appears.
 """.strip()
 
 

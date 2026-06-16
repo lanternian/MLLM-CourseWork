@@ -117,7 +117,43 @@ python -m web_agent web --share
 - 直接查看 Agent 的 Markdown 回复
 - 后续扩展多轮对话和历史记录
 
-### 4. 运行示例任务
+### 4. 启动后端 API（模式 B）
+
+模式 B 适合将 Agent 作为后端服务接入到你自己的前端或其他客户端中。它提供了一个基于 FastAPI 的接口，便于后续扩展成流式输出、前后端分离或多会话管理。
+
+#### 启动方式
+
+```powershell
+python -m web_agent api
+```
+
+默认会启动在：
+
+```text
+http://127.0.0.1:8000
+```
+
+#### 可用接口
+
+- `GET /health`：健康检查
+- `POST /api/chat`：提交任务并获得 Markdown 回复和结构化结果
+
+#### 请求示例
+
+```powershell
+curl -X POST http://127.0.0.1:8000/api/chat `
+  -H "Content-Type: application/json" `
+  -d "{\"task\":\"搜索 Mind2Web 数据集\",\"url\":\"https://www.baidu.com/\"}"
+```
+
+#### 适合的使用场景
+
+- 接入自定义网页前端
+- 集成到桌面应用或小程序
+- 作为课程项目的后端演示接口
+- 未来扩展成 SSE / WebSocket 流式输出
+
+### 5. 运行示例任务
 
 **示例1：百度搜索**
 
@@ -252,13 +288,17 @@ multi-modal/
 │   ├── __init__.py
 │   ├── __main__.py            # 命令行入口
 │   ├── agent.py               # Agent 主循环逻辑
+│   ├── api.py                 # 模式 B FastAPI 接口
 │   ├── browser.py             # Playwright 浏览器控制（含反检测）
+│   ├── chat.py                # Markdown 输出格式化
 │   ├── cli.py                 # 命令行参数解析
 │   ├── config.py              # 配置管理
 │   ├── evaluation.py          # 批量评测框架
 │   ├── models.py              # 数据模型（Action, Observation 等）
 │   ├── perception.py          # 页面感知与元素标注
-│   └── planner.py             # 多模态规划器（Qwen2.5-VL）
+│   ├── planner.py             # 多模态规划器（Qwen2.5-VL）
+│   ├── server.py              # 模式 B 启动入口
+│   └── web_ui.py              # 模式 A Gradio 前端
 ├── artifacts/                  # 运行产物（自动生成）
 │   ├── <run_id>/
 │   │   ├── step_01.png       # 原始截图
@@ -331,6 +371,8 @@ Playwright 打开目标网页
 | `pydantic` | >=2.11.0 | 数据模型验证 |
 | `PyYAML` | >=6.0.1 | 读取配置文件 |
 | `playwright-stealth` | >=0.1.0 | 反检测（可选） |
+| `fastapi` | >=0.115.0 | 模式 B 后端 API |
+| `uvicorn` | >=0.30.0 | FastAPI 运行服务器 |
 
 ---
 

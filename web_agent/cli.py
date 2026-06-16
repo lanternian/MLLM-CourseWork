@@ -8,6 +8,7 @@ from .chat import format_markdown_reply
 from .config import Settings
 from .evaluation import load_scenarios, run_evaluation
 from .planner import PlanningError, QwenVLPlanner
+from .server import launch as launch_api_server
 from .web_ui import launch as launch_web_ui
 
 
@@ -30,6 +31,10 @@ def main() -> None:
 
     if args.command == "web":
         launch_web_ui(settings, share=args.share)
+        return
+
+    if args.command == "api":
+        launch_api_server(settings, host=args.host, port=args.port)
         return
 
     scenarios = load_scenarios(Path(args.config))
@@ -73,6 +78,10 @@ def _build_parser() -> argparse.ArgumentParser:
 
     web_parser = subparsers.add_parser("web", help="Launch the Gradio chat UI")
     web_parser.add_argument("--share", action="store_true", help="Create a public Gradio link")
+
+    api_parser = subparsers.add_parser("api", help="Launch the FastAPI backend for mode B")
+    api_parser.add_argument("--host", default="127.0.0.1")
+    api_parser.add_argument("--port", type=int, default=8000)
     return parser
 
 

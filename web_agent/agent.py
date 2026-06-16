@@ -6,8 +6,13 @@ from uuid import uuid4
 
 from .browser import BrowserController, ExecutionError, PerceptionError
 from .config import Settings
-from .models import Action, RunResult, StepRecord
+from .models import RunResult, StepRecord
 from .planner import Planner, PlanningError
+
+
+def _append_record(path: Path, record: StepRecord) -> None:
+    with path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record.model_dump(), ensure_ascii=False) + "\n")
 
 
 class WebAgent:
@@ -42,24 +47,19 @@ class WebAgent:
                 final_url = observation.url
                 final_title = observation.title
                 final_text = observation.body_text
-                
-                # 反检测：检查是否遇到验证码
+
                 captcha_result = browser.detect_captcha()
                 if captcha_result["detected"]:
                     print(f"\n⚠️ 步骤 {step}: {captcha_result['message']}")
-                    
-                    # 等待人工介入
                     if not browser.wait_for_human_intervention(max_wait_seconds=120):
                         failure_type = "execution_failure"
                         error = f"验证码未被处理: {captcha_result['message']}"
                         break
-                    
-                    # 人工介入后重新观察页面
                     observation = browser.observe(step)
                     final_url = observation.url
                     final_title = observation.title
                     final_text = observation.body_text
-                
+
                 action = self.planner.next_action(task, observation, history)
                 record = StepRecord(
                     step=step,
@@ -129,8 +129,3 @@ class WebAgent:
             encoding="utf-8",
         )
         return result
-
-
-def _append_record(path: Path, record: StepRecord) -> None:
-    with path.open("a", encoding="utf-8") as stream:
-        stream.write(json.dumps(record.model_dump(), ensure_ascii=False) + "\n")
